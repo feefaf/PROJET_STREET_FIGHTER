@@ -1,0 +1,92 @@
+IA Street Fighter model reinforcement learning
+----------------------------------------------
+
+Lien de la video youtube: https://www.youtube.com/watch?v=rzbFhu6So5U
+
+
+Chapitres de création:
+---------
+Différentes étapes a suivre:
+- Setup Street Fighter sur Pyhton avec gym retro
+- Preprocess
+- réglages des hyperparamètres (Dans notre cas ça sera fait avec Optuna)
+- entrainement du modèle (avec Stable baselines)
+- Tester le modèle
+
+Première étape - Setup Street Fighter sur Gym :
+-----------------------------------------------
+Necessite l'installation de 2 choses
+- Open AI Gym
+- Gym retro
+
+Qu'est ce que Gym ?:
+-------------------
+C'est l'outil de base pour créer des modèles de réenforcement. 
+lien vers la doc: https://www.gymlibrary.dev/index.html
+comme son nom l'indique, c'est la salle de sport ou notre modèle peu s'entrainer et
+apprendre a jouer.
+
+[Point historique:
+Askip Open AI Gym a pour fondateur la zone 51. ça servait a faire des test militaire
+donc cet outils est très serieux, c'est pas du n'importe quoi.]
+
+Et parmis les outils de Gym on a Gym retro qui permet comme son nom l'indique aussi a créer
+des modèles sur des jeux retro, en l'occurence ici : Street Fighter.
+
+Partie Technique.
+------------------
+Evidemment tout sera fait sur Jupyter notebook.
+Je conseil de ouf de se créer un environnement dédié pour ce projet parce que il faut une version
+de python précise et il faut éviter les problèmes d'incompabatibilité avec vos autres librairies.
+
+#Comment créer un environnement
+conda create -n gym_env python=3.7.3 jupyter notebook
+#activer votre environnement
+conda activate gym_env
+#Lancer jupyter notebook depuis ce même terminal pour qu'il sois sur cet environnement
+jupyter notebook
+
+
+Lien de la ROM du jeu :
+-------------
+https://wowroms.com/en/roms/sega-genesis-megadrive/street-fighter-ii-special-champion-edition-europe/26496.html
+
+Installer le jeu dans l'émulateur Gym Retro 
+--------------------------------------------
+- Ouvrir l'invite de commande anaconda
+- activer l'environnement du projet (conda activate gym_env)
+- aller grace aux commandes cd jusqu'a votre dossier ou se trouve la/les ROMS que 
+t'as installé.
+- executer cette commande précise : [python -m retro.import .]
+-normalement le message :
+Importing StreetFighterIISpecialChampionEdition-Genesis
+Imported 1 games
+apparaitra.
+
+
+Si c'est pas le cas sah je sais pas pk. Moi aussi j'ai eu un bug.
+J'avais téléchargé la version europe, ça a pas marché
+ensuite j'ai installé la version USA
+et la ça a marché pour les 2 bizarrement.
+
+
+anaconda3\envs\gym_env
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
