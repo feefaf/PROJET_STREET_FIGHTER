@@ -39,13 +39,18 @@ Evidemment tout sera fait sur Jupyter notebook.
 Je conseil de ouf de se créer un environnement dédié pour ce projet parce que il faut une version
 de python précise et il faut éviter les problèmes d'incompabatibilité avec vos autres librairies.
 
-#Comment créer un environnement
+### Initialisation
+#Ouvir l'anaconda Prompt et taper la commande suivante pour créer un environnement
 conda create -n gym_env python=3.7.3 jupyter notebook
 #activer votre environnement
 conda activate gym_env
 #Lancer jupyter notebook depuis ce même terminal pour qu'il sois sur cet environnement
 jupyter notebook
 
+### Installation des librairie aux bonnes versions :
+# Il suffit d'ouvrir le notebook sur jupyter et de lancer les 3 première cellule de la section
+[INITIALISATION DES LIBRAIRIE DE L'ENVIRONNEMENT (extremement important)]
+(C'est juste des pip install)
 
 Lien de la ROM du jeu :
 -------------
@@ -53,7 +58,7 @@ https://wowroms.com/en/roms/sega-genesis-megadrive/street-fighter-ii-special-cha
 
 Installer le jeu dans l'émulateur Gym Retro 
 --------------------------------------------
-- Ouvrir l'invite de commande anaconda
+- Ouvrir une nouvelle invite de commande anaconda
 - activer l'environnement du projet (conda activate gym_env)
 - aller grace aux commandes cd jusqu'a votre dossier ou se trouve la/les ROMS que 
 t'as installé.
