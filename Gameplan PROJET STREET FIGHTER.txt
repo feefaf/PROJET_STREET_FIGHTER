@@ -68,12 +68,74 @@ Si c'est pas le cas sah je sais pas pk. Moi aussi j'ai eu un bug.
 J'avais téléchargé la version europe, ça a pas marché
 ensuite j'ai installé la version USA
 et la ça a marché pour les 2 bizarrement.
-
-
 anaconda3\envs\gym_env
 
+Deuxième étape - Preprocessing :
 
+Objectif de la partie :  crée un environnement Street Fighter simplifié et adapté à l'apprentissage par renforcement. 
+L'IA va recevoir des images prétraitées du jeu et apprendre à choisir les actions qui maximisent sa récompense (le score).
 
+Explication des fonctions : 
+
+**`__init__(self)`**
+
+C'est le constructeur de la classe `StreetFighter`. Il est appelé automatiquement quand on crée un nouvel objet de cette classe. Son rôle est d'initialiser l'environnement de jeu pour l'IA.
+
+*   `super().__init__()` :  Cette ligne appelle le constructeur de la classe parente (`Env`). Cela permet d'hériter des propriétés et des méthodes de base de la classe `Env` de Gym.
+*   `self.observation_space = Box(low=0, high=255, shape=(84, 84, 1), dtype=np.uint8)` :  Ici, on définit le type d'observations que l'IA va recevoir.  
+    *   `Box` signifie que les observations sont des valeurs numériques continues.
+    *   `low=0, high=255` indique que les valeurs seront comprises entre 0 et 255 (ce qui correspond aux valeurs des pixels d'une image en niveaux de gris).
+    *   `shape=(84, 84, 1)`  précise la forme des observations : des images de 84 pixels de hauteur, 84 pixels de largeur et 1 canal (niveaux de gris).
+    *   `dtype=np.uint8` indique que les valeurs seront stockées sous forme d'entiers non signés de 8 bits.
+*   `self.action_space = MultiBinary(12)` :  On définit les actions possibles pour l'IA.  
+    *   `MultiBinary(12)` signifie que l'IA peut activer ou désactiver 12 boutons binaires indépendamment (un peu comme appuyer ou relâcher 12 touches sur un clavier). Cela correspondra aux actions du jeu comme "haut", "bas", "gauche", "droite", "poing", "pied", etc.
+*   `self.game = retro.make(game='StreetFighterIISpecialChampionEdition-Genesis', use_restricted_actions=retro.Actions.FILTERED)` :  On crée une instance du jeu Street Fighter II Special Champion Edition.
+    *   `retro.make(...)`  utilise la librairie `retro` pour lancer l'émulateur du jeu.
+    *   `use_restricted_actions=retro.Actions.FILTERED`  simplifie l'espace d'actions en ne gardant qu'un ensemble d'actions de base.
+
+**`reset(self)`**
+
+Cette méthode est appelée au début de chaque nouvelle partie. Elle remet l'environnement à zéro et retourne la première observation.
+
+*   `obs = self.game.reset()` :  On appelle la méthode `reset()` de l'objet `game` pour réinitialiser le jeu. Cela revient à appuyer sur le bouton "Start" pour commencer une nouvelle partie.
+*   `obs = self.preprocess(obs)` :  On prétraite l'image brute retournée par le jeu.
+*   `self.previous_frame = obs` : On stocke l'image prétraitée dans l'attribut `self.previous_frame`. Cela servira à calculer la différence entre deux images consécutives dans la méthode `step`.
+*   `self.score = 0` :  On initialise le score à 0.
+*   `return obs` : On retourne l'observation prétraitée à l'agent (l'IA).
+
+**`preprocess(self, observation)`**
+
+Cette méthode prend en entrée une image brute du jeu et la prétraite pour la rendre plus facile à analyser par l'IA.
+
+*   `gray = cv2.cvtColor(observation, cv2.COLOR_BGR2GRAY)` :  On convertit l'image en niveaux de gris avec la fonction `cvtColor` de la librairie OpenCV (`cv2`).
+*   `resize = cv2.resize(gray, (84,84), interpolation=cv2.INTER_CUBIC)` : On redimensionne l'image à 84x84 pixels avec la fonction `resize`.  L'argument `interpolation=cv2.INTER_CUBIC`  spécifie le type d'interpolation utilisé pour le redimensionnement.
+*   `channels = np.reshape(resize, (84,84,1))` :  On ajoute une dimension à l'image pour la rendre compatible avec les réseaux de neurones convolutifs.  Ces réseaux attendent généralement des images avec 3 dimensions : hauteur, largeur et canaux de couleur.  Même si l'image est en niveaux de gris (1 canal), on ajoute cette dimension pour respecter le format attendu.
+*   `return channels` : On retourne l'image prétraitée.
+
+**`step(self, action)`**
+
+Cette méthode est la base de l'interaction entre l'IA et l'environnement. Elle prend en entrée une action choisie par l'IA et la transmet au jeu. 
+Elle récupère les conséquences de cette action et les retourne à l'IA.
+
+*   `obs, reward, done, info = self.game.step(action)` :  On envoie l'action au jeu avec la méthode `step()` de l'objet `game`. On récupère ensuite :
+    *   `obs` : la nouvelle observation (image) après avoir effectué l'action.
+    *   `reward` : la récompense obtenue après l'action.
+    *   `done` : un booléen qui indique si la partie est terminée (par exemple, si un joueur a perdu toute sa vie).
+    *   `info` : un dictionnaire qui contient des informations supplémentaires sur l'état du jeu.
+*   `obs = self.preprocess(obs)` :  On prétraite la nouvelle observation.
+*   `frame_delta = obs - self.previous_frame` : On calcule la différence entre l'image actuelle et la précédente. Cela permet à l'IA de percevoir le mouvement et les changements dans l'environnement.
+*   `self.previous_frame = obs` : On met à jour l'attribut `self.previous_frame` avec l'image actuelle.
+*   `reward = info['score'] - self.score` : On calcule la récompense en fonction du changement de score.  On récupère le score actuel dans le dictionnaire `info` et on le compare au score précédent.
+*   `self.score = info['score']` : On met à jour l'attribut `self.score` avec le score actuel.
+*   `return frame_delta, reward, done, info` : On retourne les informations à l'IA.
+
+**`render(self, *args, **kwargs)`**
+
+Cette méthode affiche le jeu à l'écran. Elle est utile pour visualiser ce que l'IA "voit" et comment elle interagit avec l'environnement.
+
+**`close(self)`**
+
+Cette méthode ferme l'environnement et libère les ressources utilisées par le jeu.
 
 
 
